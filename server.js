@@ -14,22 +14,39 @@ app.set("views", "./views");
 
 app.use(express.static(path.join(__dirname, "public")));
 
+const { checkGameExists } = require("./helpers");
+
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
 
-websockets(server);
+const games = [];
+
+websockets(server, games);
 
 app.get("/", (req, res) => {
+  res.render("home");
+});
+
+app.get("/connect", (req, res) => {
   const id = short.generate();
-  res.render("home", {
+  games.push({
     id: id,
+    playerOne: null,
+    playerTwo: null,
   });
+  res.redirect(`/game?id=${id}`);
 });
 
 app.get("/game", (req, res) => {
-  console.log(req.query.game_id);
-  res.render("home");
+  const id = req.query.id;
+  if (checkGameExists(id, games)) {
+    res.render("game", {
+      id,
+    });
+  } else {
+    res.redirect("/");
+  }
 });
