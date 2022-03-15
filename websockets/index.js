@@ -46,7 +46,16 @@ module.exports = async (expressServer, games) => {
 
     ws.player = joinGame(ws.gameId, ws.socketId);
 
-    messageClient(ws, { method: "update-player", player: ws.player });
+    const game = findGame(ws.gameId, games);
+
+    messageClient(ws, {
+      method: "init",
+      player: ws.player,
+      playerOne: game.playerOne,
+      playerTwo: game.playerTwo,
+      playerOneName: game.playerOneName,
+      playerTwoName: game.playerTwoName,
+    });
   };
 
   const handleClose = (ws) => {
@@ -54,6 +63,11 @@ module.exports = async (expressServer, games) => {
   };
 
   const handleMessage = (ws, message) => {
+    if (ws.player === null) {
+      ws.close(1000, "You are not allowed to send messages");
+      return;
+    }
+
     const parsedMessage = JSON.parse(message);
 
     const { method } = parsedMessage;
@@ -61,15 +75,27 @@ module.exports = async (expressServer, games) => {
     switch (method) {
       case "set-player-name":
         const { playerName } = parsedMessage;
-        ws.playerName = playerName;
+        setPlayerName(ws.gameId, ws.player, playerName);
         messageAllClients({
           method: "set-player-name",
           player: ws.player,
-          name: ws.playerName,
+          name: playerName,
         });
         break;
       default:
         return;
+    }
+  };
+
+  const setPlayerName = (gameId, player, playerName) => {
+    const game = findGame(gameId, games);
+
+    if (game === undefined) return;
+
+    if (player === 1) {
+      game.playerOneName = playerName;
+    } else if (player === 2) {
+      game.playerTwoName = playerName;
     }
   };
 
@@ -96,6 +122,7 @@ module.exports = async (expressServer, games) => {
 
     if (game === undefined) {
       // doesn't exist
+      return null;
     }
 
     if (game.playerOne === null) {

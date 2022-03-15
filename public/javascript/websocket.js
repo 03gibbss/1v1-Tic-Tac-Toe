@@ -22,10 +22,13 @@ socket.addEventListener("message", ({ data }) => {
   const { method } = parsedMessage;
 
   switch (method) {
-    case "update-player":
+    case "init":
       updatePlayer(parsedMessage.player);
+      updatePlayerNameOutput(1, parsedMessage.playerOneName);
+      updatePlayerNameOutput(2, parsedMessage.playerTwoName);
       break;
     case "set-player-name":
+      console.log(parsedMessage.player, parsedMessage.name);
       updatePlayerNameOutput(parsedMessage.player, parsedMessage.name);
     default:
       // adjust this
