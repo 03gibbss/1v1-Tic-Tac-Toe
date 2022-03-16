@@ -1,6 +1,6 @@
 const id = new URLSearchParams(window.location.search).get("id");
 
-let socket = new WebSocket(`ws://localhost:3000/websockets?id=${id}`);
+let socket = new WebSocket(`ws://${location.host}/websockets?id=${id}`);
 
 const nameInput = document.querySelector("#name-input");
 const setNameBtn = document.querySelector("#set-name");
@@ -50,11 +50,7 @@ socket.addEventListener("message", ({ data }) => {
       currentTurnOutput.innerHTML = `${parsedMessage.winner} wins!`;
       gameover = true;
     default:
-      // adjust this
-      const { message } = parsedMessage;
-      const response = document.createElement("p");
-      response.innerHTML = message;
-      responses.append(response);
+      return;
   }
 });
 
