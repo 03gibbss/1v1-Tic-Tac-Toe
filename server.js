@@ -36,8 +36,10 @@ app.get("/connect", (req, res) => {
     id: id,
     playerOne: null,
     playerTwo: null,
-    playerOneName: 'Player One',
-    playerTwoName: 'Player Two'
+    playerOneName: "Player One",
+    playerTwoName: "Player Two",
+    boardArray: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    turn: "X",
   });
   res.redirect(`/game?id=${id}`);
 });

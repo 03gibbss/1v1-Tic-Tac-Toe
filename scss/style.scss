@@ -1,0 +1,53 @@
+.current-piece {
+  height: 50px;
+  width: 158px;
+  margin: 2px;
+  background: yellow;
+  display: flex;
+
+  &__piece {
+    margin: auto;
+    color: black;
+  }
+}
+
+.gameboard {
+  display: none;
+
+  &--active {
+    display: block;
+  }
+
+  &__row {
+    display: flex;
+  }
+
+  &__block {
+    height: 50px;
+    width: 50px;
+    background: grey;
+    margin: 2px;
+    display: flex;
+    cursor: pointer;
+
+    &--contains-piece {
+      background: pink;
+      cursor: auto;
+    }
+
+    &--winner {
+      background: green;
+    }
+  }
+
+  &__piece {
+    margin: auto;
+    color: white;
+    pointer-events: none;
+  }
+}
+
+.reset {
+  margin: 2px;
+  width: 158px;
+}

@@ -5,7 +5,11 @@ const WebSocket = require("ws");
 const queryString = require("query-string");
 const short = require("short-uuid");
 
-const { findGame, checkGameExists } = require("../helpers");
+const {
+  findGame,
+  checkGameExists,
+  winningCombinations,
+} = require("../helpers");
 
 module.exports = async (expressServer, games) => {
   const wss = new WebSocket.Server({
@@ -82,9 +86,76 @@ module.exports = async (expressServer, games) => {
           name: playerName,
         });
         break;
+      case "move":
+        makeMove(ws.gameId, ws.player, parsedMessage.position);
+        break;
       default:
         return;
     }
+  };
+
+  const makeMove = (gameId, player, position) => {
+    const game = findGame(gameId, games);
+    game["boardArray"][position] = player;
+
+    const win = checkForWin(game.boardArray);
+
+    // broadcast move
+    messageAllClientsInGame(
+      {
+        method: "move",
+        player: player,
+        position: position,
+      },
+      gameId
+    );
+    // update turn
+    if (player === 1) {
+      game["turn"] = "O";
+    } else {
+      game["turn"] = "X";
+    }
+    messageAllClientsInGame(
+      {
+        method: "update-turn",
+        turn: game["turn"],
+      },
+      gameId
+    );
+
+    if (win) {
+      messageAllClientsInGame(
+        {
+          method: "game-over",
+          winner: player,
+        },
+        gameId
+      );
+    }
+  };
+
+  const checkForWin = (boardArray) => {
+    let win = false;
+
+    winningCombinations.forEach((winningCombination) => {
+      let xmatches = 0;
+      let ymatches = 0;
+
+      winningCombination.forEach((position) => {
+        if (boardArray[position - 1] === 1) {
+          xmatches++;
+        } else if (boardArray[position - 1] === 2) {
+          ymatches++;
+        }
+      });
+
+      if (xmatches === 3) {
+        win = true;
+      } else if (ymatches === 3) {
+        win = true;
+      }
+    });
+    return win;
   };
 
   const setPlayerName = (gameId, player, playerName) => {
@@ -104,8 +175,17 @@ module.exports = async (expressServer, games) => {
   };
 
   const messageAllClients = (message) => {
+    // need something here to filter to just the current game?
     wss.clients.forEach((client) => {
       client.send(JSON.stringify(message));
+    });
+  };
+
+  const messageAllClientsInGame = (message, gameId) => {
+    wss.clients.forEach((client) => {
+      if (client.gameId === gameId) {
+        client.send(JSON.stringify(message));
+      }
     });
   };
 
@@ -132,6 +212,7 @@ module.exports = async (expressServer, games) => {
     } else if (game.playerTwo === null) {
       game.playerTwo = socketId;
       console.log(`${socketId} is player two in ${gameId}`);
+      gameIsReady(gameId);
       return 2;
     } else {
       // too many players are connected
@@ -153,6 +234,15 @@ module.exports = async (expressServer, games) => {
         game.playerTwo = null;
       }
     }
+  };
+
+  const gameIsReady = (gameId) => {
+    messageAllClientsInGame(
+      {
+        method: "game-ready",
+      },
+      gameId
+    );
   };
 
   return wss;

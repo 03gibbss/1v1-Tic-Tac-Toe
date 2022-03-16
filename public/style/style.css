@@ -1,0 +1,60 @@
+.current-piece {
+  height: 50px;
+  width: 158px;
+  margin: 2px;
+  background: yellow;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.current-piece__piece {
+  margin: auto;
+  color: black;
+}
+
+.gameboard {
+  display: none;
+}
+
+.gameboard--active {
+  display: block;
+}
+
+.gameboard__row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.gameboard__block {
+  height: 50px;
+  width: 50px;
+  background: grey;
+  margin: 2px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  cursor: pointer;
+}
+
+.gameboard__block--contains-piece {
+  background: pink;
+  cursor: auto;
+}
+
+.gameboard__block--winner {
+  background: green;
+}
+
+.gameboard__piece {
+  margin: auto;
+  color: white;
+  pointer-events: none;
+}
+
+.reset {
+  margin: 2px;
+  width: 158px;
+}
+/*# sourceMappingURL=style.css.map */

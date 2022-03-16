@@ -10,7 +10,13 @@ const playerOutput = document.querySelector("#player-output");
 const playerOneName = document.querySelector("#player-one-name");
 const playerTwoName = document.querySelector("#player-two-name");
 
-const responses = document.querySelector("#responses");
+const currentTurnOutput = document.querySelector("#current-turn");
+
+let piece = "";
+let turn = "X";
+let gameover = false;
+
+const gameboardElement = document.querySelector(".gameboard");
 
 let playerName = "";
 
@@ -28,8 +34,21 @@ socket.addEventListener("message", ({ data }) => {
       updatePlayerNameOutput(2, parsedMessage.playerTwoName);
       break;
     case "set-player-name":
-      console.log(parsedMessage.player, parsedMessage.name);
       updatePlayerNameOutput(parsedMessage.player, parsedMessage.name);
+      break;
+    case "game-ready":
+      enableGameBoard();
+      break;
+    case "move":
+      updateMove(parsedMessage.player, parsedMessage.position);
+      break;
+    case "update-turn":
+      turn = parsedMessage.turn;
+      currentTurnOutput.innerHTML = `${turn}'s turn`;
+      break;
+    case "game-over":
+      currentTurnOutput.innerHTML = `${parsedMessage.winner} wins!`;
+      gameover = true;
     default:
       // adjust this
       const { message } = parsedMessage;
@@ -64,8 +83,10 @@ const updatePlayer = (player) => {
   nameInput.value = `Player ${player}`;
   if (player === 1) {
     playerOutput.innerHTML = "You are X";
+    piece = "X";
   } else if (player === 2) {
     playerOutput.innerHTML = "You are O";
+    piece = "O";
   } else {
     playerOutput.innerHTML = "You are a spectator";
   }
@@ -79,4 +100,61 @@ const updatePlayerNameOutput = (player, playerName) => {
   } else if (player === 2) {
     playerTwoName.innerHTML = playerName;
   }
+};
+
+const enableGameBoard = () => {
+  gameboardElement.classList.add("gameboard--active");
+};
+
+gameboardElement.addEventListener("mouseover", (e) => {
+  if (turn !== piece) return;
+  if (gameover) return;
+  if (!e.target.classList.contains("gameboard__block")) return;
+  if (e.target.dataset.containspiece === "true") return;
+
+  e.target.children[0].innerHTML = piece;
+
+  e.target.addEventListener(
+    "mouseout",
+    () => {
+      if (e.target.dataset.containspiece === "true") return;
+      e.target.children[0].innerHTML = "";
+    },
+    { once: true }
+  );
+});
+
+gameboardElement.addEventListener("click", (e) => {
+  if (turn !== piece) return;
+  if (gameover) return;
+  if (!e.target.classList.contains("gameboard__block")) return;
+  if (e.target.dataset.containspiece === "true") return;
+
+  sendMessage({
+    method: "move",
+    position: e.target.dataset.position,
+  });
+});
+
+const sendMessage = (message) => {
+  socket.send(JSON.stringify(message));
+};
+
+const updateMove = (player, position) => {
+  let newPiece = "";
+  if (player === 1) {
+    newPiece = "X";
+  } else if (player === 2) {
+    newPiece = "O";
+  }
+
+  gameboardElement.querySelector(
+    `[data-position='${position}']`
+  ).children[0].innerHTML = newPiece;
+  gameboardElement.querySelector(
+    `[data-position='${position}']`
+  ).dataset.containspiece = "true";
+  gameboardElement
+    .querySelector(`[data-position='${position}']`)
+    .classList.add("gameboard__block--contains-piece");
 };
