@@ -54,3 +54,7 @@ app.get("/game", (req, res) => {
     res.redirect("/");
   }
 });
+
+app.get("/*", (req, res) => {
+  res.redirect("/");
+});
