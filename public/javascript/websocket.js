@@ -18,9 +18,22 @@ let gameover = false;
 
 const gameboardElement = document.querySelector(".gameboard");
 
-let playerName = "";
+let playerName;
 
-socket.addEventListener("open", () => {});
+socket.addEventListener("open", () => {
+  playerName = window.localStorage.getItem("playerName");
+
+  if (playerName) {
+    socket.send(
+      JSON.stringify({
+        method: "set-player-name",
+        playerName: playerName,
+      })
+    );
+  } else {
+    playerName = "";
+  }
+});
 
 socket.addEventListener("message", ({ data }) => {
   const parsedMessage = JSON.parse(data);
@@ -32,6 +45,7 @@ socket.addEventListener("message", ({ data }) => {
       updatePlayer(parsedMessage.player);
       updatePlayerNameOutput(1, parsedMessage.playerOneName);
       updatePlayerNameOutput(2, parsedMessage.playerTwoName);
+      // update board array etc too
       break;
     case "set-player-name":
       updatePlayerNameOutput(parsedMessage.player, parsedMessage.name);
@@ -66,6 +80,7 @@ socket.addEventListener("close", () => {
 const updatePlayerName = () => {
   if (playerName !== nameInput.value) {
     playerName = nameInput.value;
+    window.localStorage.setItem("playerName", playerName);
     socket.send(
       JSON.stringify({
         method: "set-player-name",
@@ -76,7 +91,7 @@ const updatePlayerName = () => {
 };
 
 const updatePlayer = (player) => {
-  nameInput.value = `Player ${player}`;
+  nameInput.value = playerName;
   if (player === 1) {
     playerOutput.innerHTML = "You are X";
     piece = "X";

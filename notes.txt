@@ -1,0 +1,7 @@
+- Add game state to object 'preparing' / 'ready' / 'finished' / 'player disconnected'
+- Destroy the game after x time if finished or player disconnected
+
+- Game board doesn't currently get enabled properly if you rejoin a game - need to fix up some of the logic here
+
+
+- Maybe just get rid of reconnecting - maybe that is beyond the scale of this - just get rid of the game if a player disconnects

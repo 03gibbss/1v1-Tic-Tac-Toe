@@ -59,6 +59,9 @@ module.exports = async (expressServer, games) => {
       playerTwo: game.playerTwo,
       playerOneName: game.playerOneName,
       playerTwoName: game.playerTwoName,
+      state: game.state,
+      boardArray: game.boardArray,
+      turn: game.turn,
     });
   };
 

@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
   res.render("home");
 });
 
-app.get("/connect", (req, res) => {
+app.get("/create-game", (req, res) => {
   const id = short.generate();
   games.push({
     id: id,
@@ -38,6 +38,7 @@ app.get("/connect", (req, res) => {
     playerTwo: null,
     playerOneName: "Player One",
     playerTwoName: "Player Two",
+    state: "preparing",
     boardArray: [0, 0, 0, 0, 0, 0, 0, 0, 0],
     turn: "X",
   });
