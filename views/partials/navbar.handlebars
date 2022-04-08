@@ -5,13 +5,18 @@
     </a>
     <ul class="navbar__menu">
       {{#if id}}
-        <li class="navbar__menu-item name">
-          <p class="name__output">
-            Anonymous
-          </p>
+        <li class="name">
+          <div class="name__output-container">
+            <p class="name__output">
+              Anonymous
+            </p>
+            <i class="fa-solid fa-pencil"></i>
+          </div>
           <form action="submit" class="name__form">
             <input type="text" class="name__input" value="Anonymous" />
-            <button type="submit" class="name__submit">/</button>
+            <button type="submit" class="name__submit">
+              <i class="fa-solid fa-check"></i>
+            </button>
           </form>
         </li>
       {{else}}

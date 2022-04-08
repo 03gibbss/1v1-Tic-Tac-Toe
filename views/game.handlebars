@@ -1,17 +1,23 @@
-<p>Send this code to your friend to invite: {{id}}</p>
+<p class="gamecode__container">
+  <span>Send this code to your friend to invite: </span>
+  <span class="gamecode__tooltip">
+    <span class="gamecode__tooltip-text">Copy ID</span>
+    <strong class="gamecode__id">
+    {{id}}
+    </strong>
+  </span>
+</p>
 
-<div id="player-output"></div>
-
-<div id="current-turn">X's turn</div>
-
-<div>
-  <p id="player-one-name"></p>
-  vs
-  <p id="player-two-name"></p>
+<div class="verses__container">
+  <h3 id="player-one-name" class="verses__player"></h3>
+  <span>vs</span>
+  <h3 id="player-two-name" class="verses__player"></h3>
 </div>
 
-<input type="text" id="name-input" />
-<button id="set-name">Set Name</button>
+<div class="gameinfo__container">
+  <div id="piece-output"></div>
+  <div id="current-turn">X's turn</div>
+</div>
 
 {{> gameboard }}
 

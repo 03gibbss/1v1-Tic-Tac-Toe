@@ -1,4 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+
+$font-family: "Roboto", sans-serif;
+
+@mixin menu-text-hover($color) {
+  transition: color 0.3s;
+  color: $color;
+
+  &:hover {
+    color: darken($color, 10%);
+  }
+}
+
 body {
+  font-family: $font-family;
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -36,8 +50,9 @@ footer {
   }
 
   &__name {
-    color: white;
     text-decoration: none;
+
+    @include menu-text-hover(white);
   }
 
   &__menu {
@@ -47,9 +62,12 @@ footer {
   }
 
   &__menu-item {
+    cursor: pointer;
+
     a {
-      color: white;
       text-decoration: none;
+
+      @include menu-text-hover(white);
     }
   }
 }
@@ -66,17 +84,24 @@ footer {
 
 .name {
   $root: &;
-  $output: #{$root}__output;
+  $output-container: #{$root}__output-container;
   $form: #{$root}__form;
 
   &--edit {
-    #{$output} {
+    #{$output-container} {
       display: none;
     }
 
     #{$form} {
       display: block;
     }
+  }
+
+  &__output-container {
+    display: flex;
+    gap: 10px;
+    color: white;
+    cursor: pointer;
   }
 
   &__output {
@@ -88,7 +113,94 @@ footer {
     margin: 0;
 
     input {
+      font-family: $font-family;
+      border-radius: 5px;
+      border: none;
+      padding: 5px 6px;
+      background: lightgrey;
+      margin-right: 5px;
     }
+
+    button {
+      border-radius: 50%;
+      border: none;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      background: green;
+
+      i {
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+.gamecode {
+  $root: &;
+  $tooltip-text: #{$root}__tooltip-text;
+
+  &__container {
+    margin: 10px 0;
+  }
+
+  &__tooltip {
+    display: inline-block;
+    position: relative;
+    border-style: dashed;
+    padding: 5px;
+    background: yellow;
+    border-radius: 10px;
+
+    &:hover #{$tooltip-text} {
+      visibility: visible;
+      opacity: 1;
+    }
+  }
+
+  &__tooltip-text {
+    visibility: hidden;
+    width: 140px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 135%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #555 transparent transparent transparent;
+    }
+  }
+}
+
+.verses {
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.gameinfo {
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 }
 
@@ -114,23 +226,32 @@ footer {
 
   &__row {
     display: flex;
+    justify-content: center;
   }
 
   &__block {
-    height: 50px;
-    width: 50px;
+    height: 150px;
+    width: 150px;
     background: grey;
     margin: 2px;
     display: flex;
     cursor: pointer;
+    border-radius: 10px;
+    border: 5px solid black;
+
+    &:hover {
+      background: lighten(grey, 10%);
+    }
 
     &--contains-piece {
       background: pink;
       cursor: auto;
+      pointer-events: none;
     }
 
     &--winner {
       background: green;
+      pointer-events: none;
     }
   }
 
@@ -138,6 +259,7 @@ footer {
     margin: auto;
     color: white;
     pointer-events: none;
+    font-size: 80px;
   }
 }
 

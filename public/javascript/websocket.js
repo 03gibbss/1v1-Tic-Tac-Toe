@@ -6,21 +6,17 @@ const nameOutputEl = document.querySelector(".name__output");
 const nameFormEl = document.querySelector(".name__form");
 const nameInputEl = document.querySelector(".name__input");
 
+const idTooltipEl = document.querySelector(".gamecode__tooltip");
+const idTooltipTextEl = document.querySelector(".gamecode__tooltip-text");
+
 let playerName = undefined;
 
-function init() {
-  loadPlayerName();
-}
-
-init();
-
 function loadPlayerName() {
-  playerName = window.localStorage.getItem("playerName");
+  let savedName = window.localStorage.getItem("playerName");
 
-  if (playerName) {
-    nameOutputEl.innerHTML = playerName;
-    nameInputEl.value = playerName;
-  }
+  if (!savedName) return;
+
+  updatePlayerName(savedName);
 }
 
 document.addEventListener("click", ({ target }) => {
@@ -30,23 +26,49 @@ document.addEventListener("click", ({ target }) => {
 
   if (target.closest(".name")) {
     nameContainerEl.classList.add("name--edit");
+    nameInputEl.select();
   }
+
+  if (target.closest(".gamecode__tooltip")) {
+    navigator.clipboard.writeText(id);
+    idTooltipTextEl.innerHTML = "Copied ID!";
+  }
+});
+
+idTooltipEl.addEventListener("mouseout", () => {
+  idTooltipTextEl.innerHTML = "Copy ID";
 });
 
 nameFormEl.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  console.log(nameInputEl.value);
-
   nameContainerEl.classList.remove("name--edit");
 
-  //updatePlayer();
+  updatePlayerName(nameInputEl.value);
 });
 
-const nameInput = document.querySelector("#name-input");
-const setNameBtn = document.querySelector("#set-name");
+function updatePlayerName(name) {
+  if (playerName === name) return;
 
-const playerOutput = document.querySelector("#player-output");
+  playerName = name;
+  nameOutputEl.innerHTML = name;
+  nameInputEl.value = name;
+
+  window.localStorage.setItem("playerName", name);
+
+  if (socket.readyState !== 1) return;
+
+  sendMessage({
+    method: "set-player-name",
+    playerName: name,
+  });
+}
+
+// Game Output
+
+let playerNumber = undefined;
+
+const pieceOutput = document.querySelector("#piece-output");
 
 const playerOneName = document.querySelector("#player-one-name");
 const playerTwoName = document.querySelector("#player-two-name");
@@ -61,14 +83,7 @@ const gameboardElement = document.querySelector(".gameboard");
 
 socket.addEventListener("open", () => {
   if (playerName) {
-    socket.send(
-      JSON.stringify({
-        method: "set-player-name",
-        playerName: playerName,
-      })
-    );
-  } else {
-    playerName = "";
+    sendMessage({ method: "set-player-name", playerName: playerName });
   }
 });
 
@@ -79,7 +94,7 @@ socket.addEventListener("message", ({ data }) => {
 
   switch (method) {
     case "init":
-      updatePlayer(parsedMessage.player);
+      updatePlayerNumber(parsedMessage.player);
       updatePlayerNameOutput(1, parsedMessage.playerOneName);
       updatePlayerNameOutput(2, parsedMessage.playerTwoName);
       // update board array etc too
@@ -114,33 +129,18 @@ socket.addEventListener("close", () => {
   socket = null;
 });
 
-const updatePlayerName = () => {
-  if (playerName !== nameInput.value) {
-    playerName = nameInput.value;
-    window.localStorage.setItem("playerName", playerName);
-    socket.send(
-      JSON.stringify({
-        method: "set-player-name",
-        playerName: playerName,
-      })
-    );
-  }
-};
-
-const updatePlayer = (player) => {
-  nameInput.value = playerName;
-  if (player === 1) {
-    playerOutput.innerHTML = "You are X";
+const updatePlayerNumber = (number) => {
+  playerNumber = number;
+  if (number === 1) {
+    pieceOutput.innerHTML = "You are X";
     piece = "X";
-  } else if (player === 2) {
-    playerOutput.innerHTML = "You are O";
+  } else if (number === 2) {
+    pieceOutput.innerHTML = "You are O";
     piece = "O";
   } else {
-    playerOutput.innerHTML = "You are a spectator";
+    pieceOutput.innerHTML = "You are a spectator";
   }
 };
-
-setNameBtn.addEventListener("click", updatePlayerName);
 
 const updatePlayerNameOutput = (player, playerName) => {
   if (player === 1) {
@@ -206,3 +206,9 @@ const updateMove = (player, position) => {
     .querySelector(`[data-position='${position}']`)
     .classList.add("gameboard__block--contains-piece");
 };
+
+function init() {
+  loadPlayerName();
+}
+
+init();
