@@ -1,3 +1,97 @@
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  flex-grow: 1;
+}
+
+nav,
+main,
+footer {
+  flex-shrink: 0;
+}
+
+.container {
+  width: 60%;
+  margin: 0 auto;
+}
+
+.navbar {
+  background: grey;
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+  }
+
+  &__name {
+    color: white;
+    text-decoration: none;
+  }
+
+  &__menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__menu-item {
+    a {
+      color: white;
+      text-decoration: none;
+    }
+  }
+}
+
+.footer {
+  background: grey;
+
+  &__container {
+    display: flex;
+    height: 40px;
+    align-items: center;
+  }
+}
+
+.name {
+  $root: &;
+  $output: #{$root}__output;
+  $form: #{$root}__form;
+
+  &--edit {
+    #{$output} {
+      display: none;
+    }
+
+    #{$form} {
+      display: block;
+    }
+  }
+
+  &__output {
+    pointer-events: none;
+  }
+
+  &__form {
+    display: none;
+    margin: 0;
+
+    input {
+    }
+  }
+}
+
 .current-piece {
   height: 50px;
   width: 158px;

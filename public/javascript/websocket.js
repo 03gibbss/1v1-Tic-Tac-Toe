@@ -1,6 +1,47 @@
 const id = new URLSearchParams(window.location.search).get("id");
-
 let socket = new WebSocket(`ws://${location.host}/websockets?id=${id}`);
+
+const nameContainerEl = document.querySelector(".name");
+const nameOutputEl = document.querySelector(".name__output");
+const nameFormEl = document.querySelector(".name__form");
+const nameInputEl = document.querySelector(".name__input");
+
+let playerName = undefined;
+
+function init() {
+  loadPlayerName();
+}
+
+init();
+
+function loadPlayerName() {
+  playerName = window.localStorage.getItem("playerName");
+
+  if (playerName) {
+    nameOutputEl.innerHTML = playerName;
+    nameInputEl.value = playerName;
+  }
+}
+
+document.addEventListener("click", ({ target }) => {
+  if (!target.closest(".name")) {
+    nameContainerEl.classList.remove("name--edit");
+  }
+
+  if (target.closest(".name")) {
+    nameContainerEl.classList.add("name--edit");
+  }
+});
+
+nameFormEl.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  console.log(nameInputEl.value);
+
+  nameContainerEl.classList.remove("name--edit");
+
+  //updatePlayer();
+});
 
 const nameInput = document.querySelector("#name-input");
 const setNameBtn = document.querySelector("#set-name");
@@ -18,11 +59,7 @@ let gameover = false;
 
 const gameboardElement = document.querySelector(".gameboard");
 
-let playerName;
-
 socket.addEventListener("open", () => {
-  playerName = window.localStorage.getItem("playerName");
-
   if (playerName) {
     socket.send(
       JSON.stringify({
